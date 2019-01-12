@@ -1,0 +1,206 @@
+%%       Loughborough University      %%
+%%            Joseph Stone            %%
+%%      Digital Signal Processing     %%
+%%        Coursework Assignment       %%
+close all
+clear all
+
+%%                M2.2                %%
+
+A = 7;          % Amplitude of the signal
+N = 13;         % Period of the signal
+L = 100;        % Length of sample
+Duty = 60;      % Duty cycle
+n = 0:1:L-1;    % Output the range of values depending on length (0 to 99)
+
+saw = A*sawtooth(2*pi*(n *(1/N)));  % Generate a sawtooth signal
+M2p2 = figure;
+subplot(2,1,1); % Setup a subplot for saw signal
+
+stem(n,saw)     % plot a discrete saw function
+grid on
+xlabel('Length')
+ylabel('Amplitude')
+
+sqr = A*square(2*pi*n*(1/N), Duty);
+
+subplot(2,1,2)  % Setup a subplot for square signal
+stem(n,sqr)     % plot a discrete square function
+xlabel('Length')
+ylabel('Amplitude')
+grid on
+
+%%                M2.4a                %%
+W0 = 2*pi; % Angluar frequency
+As = 3; % Amplitude of Signal
+Ls = 5; % Length
+Ph = 0; % Phase angle
+ns = linspace(0,Ls,100);
+M2p4a = figure;
+Sinwav = As*cos(W0*ns+Ph);
+
+subplot(1,1,1)
+stem(ns, Sinwav)
+grid on
+title('Sinusoidal waveform');
+xlabel('Length')
+ylabel('Amplitude')
+
+%%                M2.4b                %%
+
+angfreq = [0.14*pi, 0.24*pi, 0.34*pi, 0.68*pi, 0.75*pi];
+M2p4b = figure;
+Ls = 150; % Length
+ns = linspace(0,Ls,1500);
+for i = 1:5
+   Sinwav = As*cos((angfreq(i)*ns)+Ph);
+   
+   s(i) = subplot(5, 1, i);
+   S = stem(ns, Sinwav);
+   title(s(i), angfreq(i));
+   grid on
+   xlabel('Length')
+   ylabel('Amplitude')
+
+end
+
+%%                M3.1                 %%
+clear all
+R = [0.6, 0.9, 0.99];
+theta = [0, pi, pi/4];
+omega = 0:0.01:4*pi;
+
+for p = 1:3
+    
+    
+    d = (1-2.*R(p).*cos(theta(p))*exp(-1i.*omega)+(R(p).^(2))*exp(-1i*2.*omega));
+    
+    G = 1./d;
+
+    
+    Re = real(G);
+    Im = imag(G);
+    Magnitude = 20*log(abs(G));
+    Phase = angle(G);
+    figure(p+3);
+    subplot(2,2,1);
+    plot(omega, Re)
+    title('Real')
+    xlabel('Length')
+    ylabel('Amplitude')
+    grid on
+    subplot(2,2,2);
+    plot(omega, Im)
+    title('Imaginary')
+    xlabel('Length')
+    ylabel('Amplitude')
+    grid on
+    subplot(2,2,3);    
+    plot(omega, Magnitude)
+    title('Magnitude (db)')
+    ylabel('db')
+    xlabel('Length')
+    grid on
+    subplot(2,2,4);
+    plot(omega, Phase)
+    title('Phase')
+    ylabel('Phase')
+    xlabel('Length')
+    grid on
+end
+
+
+%%                M3.9                 %%
+
+
+gn = [3 4 -2 0 1 -4];
+hn = [1 -3 0 4 -2 3];
+xn = [2+3j, 3-1j, -1+2j, 3j, 2+4j];
+vn = [-3-2j, 1+4j, 1+2j, 5+3j, 1+2j];
+
+clin1 = conv(gn,hn);
+xpad1 = [gn zeros(1,6-length(gn))];
+ypad1 = [hn zeros(1,6-length(hn))];
+ccirc1 = ifft(fft(xpad1).*fft(ypad1));
+
+clin2 = conv(xn,vn);
+xpad2 = [xn zeros(1,5-length(xn))];
+ypad2 = [vn zeros(1,5-length(vn))];
+ccirc2 = ifft(fft(xpad2).*fft(ypad2));
+
+
+figure(7)
+
+subplot(2,1,1)
+stem(clin1,'filled')
+ylim([-35 35])
+title('Linear Convolution of gn and hn')
+ylabel('Amplitude')
+xlabel('Length of signal')
+grid on
+subplot(2,1,2)
+stem(ccirc1,'filled')
+ylim([-35 35])
+title('Circular Convolution of xpad1 and ypad1')
+ylabel('Amplitude')
+xlabel('Length of signal')
+grid on
+figure(8)
+
+subplot(2,1,1)
+stem(clin2,'filled')
+ylim([-30 25])
+title('Linear Convolution of xn and vn')
+ylabel('Amplitude')
+xlabel('Length of signal')
+grid on
+subplot(2,1,2)
+stem(ccirc2,'filled')
+ylim([-45 25])
+title('Circular Convolution of xpad2 and ypad2')
+ylabel('Amplitude')
+xlabel('Length of signal')
+grid on
+%%                M4.6                 %%
+
+clear all;
+
+i = 1;
+
+for Wo = 0:0.001:2*pi
+    z = exp(-1j*Wo);
+
+    H(i) =(0.0534.*(1+z.^(-1)).*(1-1.0166.*z.^(-1)+z.^(-2)))./...      
+  ((1-0.683.*z.^(-1)).*(1-1.4461.*z.^(-1)+0.7957.*z.^(-2)));
+
+    i = i + 1;
+end
+
+Magnitudedb = 20*log10(abs(H));
+RealH = real(H);
+ImagH = imag(H);
+
+
+Phase = arctan(ImagH/RealH);
+
+M4p6 = figure(9)
+
+
+subplot(2,1,1)
+plot(0:0.001:2*pi, Magnitudedb)
+xlim([0 2*pi])
+title('Magnitude Graph')
+xlabel('period 0 to 2pi')
+ylabel('(dB)')
+grid on
+subplot(2,1,2)
+plot(0:0.001:2*pi, Phase)
+xlim([0 2*pi])
+title('Phase Graph')
+xlabel('period 0 to 2pi')
+ylabel('radians')
+grid on
+
+
+
+
